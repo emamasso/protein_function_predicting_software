@@ -1,5 +1,3 @@
-
-
                                     ## LIBRARIES ##
 
 import argparse
@@ -9,7 +7,6 @@ import sys
 import os
 import numpy as np
 import pandas as pd
-from Bio import SeqIO 
 from src.predictor import CAFA_predictor
 
 ##############################################################################################
@@ -24,7 +21,7 @@ logger = logging.getLogger(__name__)
 def main():
     # ARGPARSE
     parser = argparse.ArgumentParser(description="Protein Function Predictor (CAFA).")
-    parser.add_argument("-i", "--input", required=True, help="Input file path (.npy or .fasta)")
+    parser.add_argument("-i", "--input", required=True, help="Input file path (.npy)")
     parser.add_argument("-c", "--config", default="config.json", help="Configuration file path")
     parser.add_argument("-o", "--output", help="Output CSV file path")
     args = parser.parse_args()
@@ -41,24 +38,13 @@ def main():
     protein_ids = []
     X_input = None
     
-    # Check estentions
-    if args.input.endswith(('.fasta', '.fa')):
-        logger.info("Reading FASTA with BioPython...")
-        try:
-            for record in SeqIO.parse(args.input, "fasta"):
-                protein_ids.append(record.id)
-            logger.warning("FASTA support is experimental. Expecting .npy features for inference.")
-            sys.exit(1) #
-        except Exception as e:
-            logger.error(f"BioPython error: {e}")
-            sys.exit(1)
-            
-    elif args.input.endswith('.npy'):
+    # Check extensions
+    if args.input.endswith('.npy'):
         try:
             X_input = np.load(args.input)
-            
-            protein_ids = [f"Prot_{i}" for i in range(X_input.shape[0])]
-            logger.info(f"Loaded input matrix: {X_input.shape}")
+            test_ids_path = config['metadata']['test_ids_path']
+            protein_ids = np.loadtxt(test_ids_path, dtype=str).tolist()
+            assert len(protein_ids) == X_input.shape[0]
         except Exception as e:
             logger.error(f"Numpy load error: {e}")
             sys.exit(1)
@@ -69,9 +55,7 @@ def main():
     # PREDICTION LOOP
     ontologies = ['MF', 'BP', 'CC']
     all_results = []
-    threshold = config['settings'].get('threshold', 0.5)
-    
-    
+    top_k = config['settings'].get('top_k', 500)
     scaler_path = config['metadata']['scaler_path']
 
     for onto in ontologies:
@@ -88,7 +72,7 @@ def main():
             X_proc = predictor.preprocess(X_input)
             
             
-            preds = predictor.predict(X_proc, protein_ids, threshold)
+            preds = predictor.predict(X_proc, protein_ids, top_k)
             
             
             for p in preds:
@@ -108,10 +92,11 @@ def main():
             out_path = os.path.join(out_dir, "predictions.csv")
             
         df = pd.DataFrame(all_results, columns=["Protein_ID", "Ontology", "GO_Term", "Score"])
+        assert all(df["Score"]> 0.0)
         df.to_csv(out_path, index=False)
         logger.info(f"SUCCESS! Results saved to: {out_path}")
     else:
-        logger.warning("No predictions found above threshold.")
+        logger.warning("No predictions generated. Check logs for errors")
 
 if __name__ == "__main__":
     main()

@@ -13,7 +13,7 @@ import os
 
 
 class CAFA_predictor:
-    def __init__(self, model, scaler, go_map, cache):
+    def __init__(self, model, scaler, go_map, cache=None):
         self.model = tf.keras.models.load_model(model)
 
         with open(scaler, 'rb') as f:
@@ -21,6 +21,8 @@ class CAFA_predictor:
 
         with open(go_map, 'rb') as f:
                 self.go_map = pickle.load(f)
+
+        self.inv_go_map = {v: k for k, v in self.go_map.items()}
 
         self.cache_df = None
         if cache:
@@ -31,8 +33,6 @@ class CAFA_predictor:
             except:
                 pass
 
-        self.inv_go_map = {v: k for k, v in self.go_map.items()}
-
     def preprocess(self, X_input):
         interpro_dim = 1000
         X_domains = X_input[:, :interpro_dim].astype(np.float32)
@@ -41,42 +41,39 @@ class CAFA_predictor:
 
         return np.concatenate([X_domains, X_embed_sc], axis=1)
     
-    def predict(self, X_preproc, prot_ids, threshold=0.5):
+    def predict(self, X_preproc, prot_ids, k=500):
+        EPS = 1e-6
         probs = self.model.predict(X_preproc, verbose=0)
         results = []
 
-        for i, pid in enumerate(prot_ids):
-            pid_str = str(pid)
-            found_in_cache = False
-            
-            if self.cache_df is not None and pid_str in self.cache_df.index:
-                subset = self.cache_df.loc[[pid_str]]
-                
-                for row in subset.itertuples():
-                    
-                    try:
-                        results.append((pid_str, row.GO_term, row.score))
-                        found_in_cache = True
-                    except AttributeError:
-                        found_in_cache = False 
+        n_terms = probs.shape[1]
+        k = min(k, n_terms)
 
-            if not found_in_cache:
-                scores = probs[i]
-                idx = np.where(scores >= 0.5)[0]
+    for i, pid in enumerate(prot_ids):
+        pid_str = str(pid)
 
-                if len(idx) == 0:
-                    idx = np.argsort(-scores)[:5]
+        # ---- Use cache if available ----
+        if self.cache_df is not None and pid_str in self.cache_df.index:
+            subset = self.cache_df.loc[[pid_str]]
+            subset = subset.sort_values("score", ascending=False).head(k)
 
-                for j in idx:
-                    if j in self.inv_go_map: 
-                        term = self.inv_go_map[j]
-                        score = float(scores[j])
-                        results.append((pid_str, term, score))
+            for row in subset.itertuples():
+                score = max(float(row.score), EPS)
+                results.append((pid_str, row.GO_term, score))
+            continue
 
-        return results
-        
+        # ---- Model-based top-K prediction ----
+        scores = probs[i]
+        top_idx = np.argsort(scores)[::-1][:k]
 
+        for j in top_idx:
+            if j in self.inv_go_map:
+                go_term = self.inv_go_map[j]
+                score = max(float(scores[j]), EPS)
+                results.append((pid_str, go_term, score))
 
-        
-        
-            
+    # Safety check (CAFA compliance)
+    for _, _, score in results:
+        assert score > 0.0
+
+    return results
