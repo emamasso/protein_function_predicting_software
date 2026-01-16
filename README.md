@@ -1,3 +1,8 @@
+# Authors
+- Emanuele Massoglia
+- Jakov Tushevski
+- 
+
 # DOCUMENTATION 
 
 This document has the sole purpose of explaining the creation of a software for using the results of a deep learning pipeline for predicting protein functions.
