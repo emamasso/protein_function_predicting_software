@@ -1,0 +1,22 @@
+{
+    "models": {
+        "MF": "models/mf_model.h5",
+        "BP": "models/bp_model.h5",
+        "CC": "models/cc_model.h5"
+    },
+    "metadata": {
+        "scaler_path": "metadata/scaler.pkl",
+        "MF_map": "metadata/go_mf_map.pkl",
+        "BP_map": "metadata/go_bp_map.pkl",
+        "CC_map": "metadata/go_cc_map.pkl"
+    },
+    "cache": {
+        "MF": "data/results/MF_predictions.csv",
+        "BP": "data/results/BP_predictions.csv",
+        "CC": "data/results/CC_predictions.csv"
+    },
+    "settings": {
+        "threshold": 0.5,
+        "default_output_dir": "output"
+    }
+}
