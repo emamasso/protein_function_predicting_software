@@ -16,7 +16,7 @@
         "CC": "data/results/CC_predictions.csv"
     },
     "settings": {
-        "threshold": 0.5,
+        "top k": 500,
         "default_output_dir": "output"
     }
 }
