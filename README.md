@@ -2,6 +2,7 @@
 
 -   Emanuele Massoglia
 -   Jakov Tushevski
+-   Gabriel Haas
 
 # DOCUMENTATION
 
