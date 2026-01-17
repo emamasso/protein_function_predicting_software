@@ -234,11 +234,11 @@ with open(f"{SAVE_PATH}/ipr_map.pkl", "wb") as f:
 
 
 # 1. Save GO terms for BP
-np.save(f"{SAVE_PATH}/bp_keep.npy", np.array(mf_keep, dtype=object))
+np.save(f"{SAVE_PATH}/bp_keep.npy", np.array(bp_keep, dtype=object))
 
 # 2. Save the GO mapping dict
 with open(f"{SAVE_PATH}/go_bp_map.pkl", "wb") as f:
-    pickle.dump(go_mf_map, f)
+    pickle.dump(go_bp_map, f)
 
 # 3. Save training protein ID list
 np.save(f"{SAVE_PATH}/train_ids.npy", np.array(train_ids, dtype=object))
