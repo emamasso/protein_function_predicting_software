@@ -8,7 +8,8 @@
         "scaler_path": "metadata/scaler.pkl",
         "MF_map": "metadata/go_mf_map.pkl",
         "BP_map": "metadata/go_bp_map.pkl",
-        "CC_map": "metadata/go_cc_map.pkl"
+        "CC_map": "metadata/go_cc_map.pkl",
+        "test_ids": "data/test/test_ids.txt"
     },
     "cache": {
         "MF": "data/results/MF_predictions.csv",
@@ -16,7 +17,7 @@
         "CC": "data/results/CC_predictions.csv"
     },
     "settings": {
-        "top k": 500,
+        "top_k": 500,
         "default_output_dir": "output"
     }
 }

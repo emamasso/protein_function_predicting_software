@@ -42,7 +42,7 @@ def main():
     if args.input.endswith('.npy'):
         try:
             X_input = np.load(args.input)
-            test_ids_path = config['metadata']['test_ids_path']
+            test_ids_path = config['metadata']['test_ids']
             protein_ids = np.loadtxt(test_ids_path, dtype=str).tolist()
             assert len(protein_ids) == X_input.shape[0]
         except Exception as e:
