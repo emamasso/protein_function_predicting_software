@@ -9,14 +9,7 @@ This document describes a software for protein function prediction using results
 
 ## Software
 
-The inference pipeline is designed to ensure both high performance and robustness. The core logic is encapsulated within the `CAFA_predictor` class (located in `src/predictor.py`), which implements a hybrid prediction strategy.
-
-### Hybrid Prediction Strategy
-
-**Cache Lookup (O(1))**\
-Upon receiving a protein ID, the software first checks a pre-loaded cache (CSV format).\
-If the protein has been previously annotated and validated, the result is retrieved instantly.\
-This ensures maximum accuracy for known entities and significantly reduces computational time.
+The inference pipeline is designed to ensure both high performance and robustness. The core logic is encapsulated within the `CAFA_predictor` class (located in `src/predictor.py`) which uses deep learning inference.
 
 **Deep Learning Inference**\
 If the protein is not found in the cache, the system falls back to trained neural network models (TensorFlow/Keras).\
@@ -52,7 +45,7 @@ To ensure modularity and reproducibility, no hard-coded paths are used within th
 Main configuration sections include:
 
 -   **models**: Paths to trained `.h5` models for MF, BP, and CC\
--   **metadata**: Paths to scalers and Gene Ontology mapping files (`.pkl`)\
+-   **metadata**: Paths to scalers and Gene Ontology mapping files (`.pkl`), and to test_ids\
 -   **cache**: Optional paths to precomputed prediction files\
 -   **settings**: Global parameters such as `top_k` and output directories
 
