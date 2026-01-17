@@ -47,7 +47,6 @@ Main configuration sections include:
 
 -   **models**: Paths to trained `.h5` models for MF, BP, and CC\
 -   **metadata**: Paths to scalers and Gene Ontology mapping files (`.pkl`), and to test_ids\
--   **cache**: Optional paths to precomputed prediction files\
 -   **settings**: Global parameters such as `top_k` and output directories
 
 ## Command-Line Interface
