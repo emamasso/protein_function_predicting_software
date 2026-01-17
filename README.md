@@ -51,7 +51,7 @@ To ensure modularity and reproducibility, no hard-coded paths are used within th
 
 Main configuration sections include:
 
--   **models**: Paths to trained `.keras` models for MF, BP, and CC\
+-   **models**: Paths to trained `.h5` models for MF, BP, and CC\
 -   **metadata**: Paths to scalers and Gene Ontology mapping files (`.pkl`)\
 -   **cache**: Optional paths to precomputed prediction files\
 -   **settings**: Global parameters such as `top_k` and output directories
