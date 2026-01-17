@@ -33,17 +33,6 @@ assert embeded_dim > 0, "Embedding dimension inferred <= 0; check interpro_dim."
 X_train_domains = X_train[:, :interpro_dim].astype(np.float32)  # keep as 0/1 float
 X_train_embed   = X_train[:, interpro_dim:].astype(np.float32)
 
-# Normalization of embeddings
-
-scaler = StandardScaler()
-X_train_embed_sc = scaler.fit_transform(X_train_embed)
-
-scaler_path = 'metadata/scaler.pkl'
-with open(scaler_path, "wb") as f:
-    pickle.dump(scaler, f)
-
-X_scaled = np.concatenate([X_train_domains, X_train_embed_sc], axis=1) # reassembling matrix
-
  
 
 ###### functions for building models #########
